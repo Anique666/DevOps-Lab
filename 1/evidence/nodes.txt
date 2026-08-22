@@ -1,0 +1,2 @@
+NAME              STATUS   ROLES           AGE   VERSION
+devops-evidence   Ready    control-plane   59s   v1.37.0

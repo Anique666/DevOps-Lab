@@ -1,0 +1,2 @@
+NAME        TYPE       CLUSTER-IP       EXTERNAL-IP   PORT(S)        AGE   SELECTOR
+hello-k8s   NodePort   10.102.241.193   <none>        80:32381/TCP   14s   app=hello-k8s
