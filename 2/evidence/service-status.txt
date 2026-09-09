@@ -1,0 +1,2 @@
+NAME                TYPE       CLUSTER-IP      EXTERNAL-IP   PORT(S)           AGE   SELECTOR
+flask-app-service   NodePort   10.106.191.75   <none>        15000:31070/TCP   6s    app=flask-app
