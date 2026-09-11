@@ -1,0 +1,2 @@
+NAME            ENDPOINTS                                                      AGE
+flashsale-svc   10.244.0.10:5000,10.244.0.5:5000,10.244.0.6:5000 + 2 more...   24s

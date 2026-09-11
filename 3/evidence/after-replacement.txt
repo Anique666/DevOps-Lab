@@ -1,0 +1,6 @@
+NAME                 READY   STATUS    RESTARTS   AGE   IP            NODE              NOMINATED NODE   READINESS GATES
+flashsale-rs-5xpqk   1/1     Running   0          24s   10.244.0.7    devops-evidence   <none>           <none>
+flashsale-rs-ds9sc   1/1     Running   0          24s   10.244.0.6    devops-evidence   <none>           <none>
+flashsale-rs-ghgls   1/1     Running   0          24s   10.244.0.5    devops-evidence   <none>           <none>
+flashsale-rs-lhmk5   1/1     Running   0          14s   10.244.0.9    devops-evidence   <none>           <none>
+flashsale-rs-sqn26   1/1     Running   0          7s    10.244.0.10   devops-evidence   <none>           <none>

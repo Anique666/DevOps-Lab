@@ -1,0 +1,2 @@
+NAME            TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)   AGE   SELECTOR
+flashsale-svc   ClusterIP   10.104.218.255   <none>        80/TCP    34s   app=flashsale

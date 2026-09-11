@@ -1,0 +1,2 @@
+NAME              STATUS   ROLES           AGE    VERSION   INTERNAL-IP    EXTERNAL-IP   OS-IMAGE                         KERNEL-VERSION                    CONTAINER-RUNTIME
+devops-evidence   Ready    control-plane   2m7s   v1.37.0   192.168.49.2   <none>        Debian GNU/Linux 12 (bookworm)   6.19.10-300.fc44.x86_64 (amd64)   containerd://2.3.4
