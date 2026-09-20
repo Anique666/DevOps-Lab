@@ -1,0 +1,4 @@
+CONTAINER ID   IMAGE            COMMAND                  CREATED         STATUS         PORTS                                         NAMES
+f7c006f2fa36   flask-api        "python app.py"          7 seconds ago   Up 6 seconds   0.0.0.0:5001->5001/tcp, [::]:5001->5001/tcp   flask
+2befae8d216e   redis:7-alpine   "docker-entrypoint.s…"   7 seconds ago   Up 6 seconds   6379/tcp                                      redis
+5f2140a8d8a1   mysql:8.4        "docker-entrypoint.s…"   8 seconds ago   Up 6 seconds   3306/tcp, 33060/tcp                           mysql

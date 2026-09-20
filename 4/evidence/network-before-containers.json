@@ -1,0 +1,43 @@
+[
+    {
+        "Name": "my-bridge-net",
+        "Id": "1323d34e00d38a269ae80dc047b36af23daaca19d9818aca183b5d9f7404cf37",
+        "Created": "2026-10-19T23:39:33.228096452+05:30",
+        "Scope": "local",
+        "Driver": "bridge",
+        "EnableIPv4": true,
+        "EnableIPv6": false,
+        "IPAM": {
+            "Driver": "default",
+            "Options": {},
+            "Config": [
+                {
+                    "Subnet": "172.18.0.0/16",
+                    "Gateway": "172.18.0.1"
+                }
+            ]
+        },
+        "Internal": false,
+        "Attachable": false,
+        "Ingress": false,
+        "ConfigFrom": {
+            "Network": ""
+        },
+        "ConfigOnly": false,
+        "Options": {},
+        "Labels": {
+            "lab": "4-docker-networking"
+        },
+        "Containers": {},
+        "Status": {
+            "IPAM": {
+                "Subnets": {
+                    "172.18.0.0/16": {
+                        "IPsInUse": 3,
+                        "DynamicIPsAvailable": 65533
+                    }
+                }
+            }
+        }
+    }
+]
