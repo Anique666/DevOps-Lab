@@ -1,0 +1,29 @@
+SELinux mode: Enforcing
+
+=== SELinux status ===
+SELinux status:                 enabled
+SELinuxfs mount:                /sys/fs/selinux
+SELinux root directory:         /etc/selinux
+Loaded policy name:             targeted
+Current mode:                   enforcing
+Mode from config file:          enforcing
+Policy MLS status:              enabled
+Policy deny_unknown status:     allowed
+Memory protection checking:     actual (secure)
+Max kernel policy version:      35
+SELINUX=enforcing
+
+=== Docker SELinux support ===
+["name=seccomp,profile=builtin","name=selinux","name=cgroupns"]
+
+=== Build the lab image if needed ===
+Image already present: flask-apparmor
+
+=== Effective label of a default container ===
+system_u:system_r:container_t:s0:c879,c940
+
+=== Configured labels for an explicit SELinux type and MCS level ===
+SecurityOpt=["label=type:container_t","label=level:s0:c100,c200"] ProcessLabel=system_u:system_r:container_t:s0:c100,c200 MountLabel=system_u:object_r:container_file_t:s0:c100,c200
+
+These are SELinux labels, not an AppArmor profile.
+Continue with /home/anique/DevOps/5/SELinux_Implementation/selinux_test.sh to test label-based access and capabilities.

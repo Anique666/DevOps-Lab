@@ -1,0 +1,66 @@
+=== 1. SELinux type enforcement on a bind-mounted host file ===
+Host label before Docker relabeling:
+drwx------. 1 anique anique unconfined_u:object_r:user_home_t:s0 16 Oct 20 00:18 /home/anique/selinux-lab-test.0QMt0N
+-rw-r--r--. 1 anique anique unconfined_u:object_r:user_home_t:s0 15 Oct 20 00:18 /home/anique/selinux-lab-test.0QMt0N/data.txt
+Without a matching label (no :z), exit=1:
+cat: /data/data.txt: Permission denied
+PASS: SELinux denied the read of the user_home_t file.
+
+With Docker's :z relabel option:
+host home data
+Host label after Docker relabeling:
+-rw-r--r--. 1 anique anique system_u:object_r:container_file_t:s0 15 Oct 20 00:18 /home/anique/selinux-lab-test.0QMt0N/data.txt
+PASS: Docker relabeled the test file to container_file_t and access succeeded.
+
+=== 2. Capability restriction with --cap-drop=ALL ===
+Default Docker capability set:
+CapEff:	00000000a80425fb
+Default container chown, exit=0:
+chown succeeded
+PASS: chown worked with Docker's default capabilities (CAP_CHOWN present).
+
+Dropped capability set:
+CapEff:	0000000000000000
+cap-drop=ALL container chown, exit=1:
+Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+PermissionError: [Errno 1] Operation not permitted: '/tmp/probe'
+PASS: dropping all capabilities denied chown.
+
+=== 3. no-new-privileges flag ===
+NoNewPrivs:	1
+PASS: the no-new-privileges flag was active in the container.
+
+=== 4. Hardened Flask container with SELinux labels ===
+Docker configuration:
+SecurityOpt=["label=type:container_t","label=level:s0:c100,c200","no-new-privileges"] ReadonlyRootfs=true CapDrop=["ALL"] ProcessLabel=system_u:system_r:container_t:s0:c100,c200 MountLabel=system_u:object_r:container_file_t:s0:c100,c200
+PASS: Docker applied the requested labels and hardening options.
+Effective container label:
+system_u:system_r:container_t:s0:c100,c200
+PASS: the container runs under the explicit SELinux type and MCS level.
+Effective capabilities and no-new-privileges:
+CapEff:	0000000000000000
+NoNewPrivs:	1
+PASS: the hardened app has no effective capabilities and NoNewPrivs=1.
+HTTP response:
+Hello, this is a secure Flask application running inside a Docker container!
+PASS: the Flask application still responds under the hardened configuration.
+chown inside the hardened app, exit=1:
+Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+PermissionError: [Errno 1] Operation not permitted: '/tmp/probe'
+PASS: chown was denied inside the hardened app.
+Write to /etc inside the read-only app, exit=2:
+sh: 1: cannot create /etc/probe: Read-only file system
+PASS: the read-only root filesystem denied the write.
+
+=== 5. AppArmor path-based and exec rules are not reproduced ===
+root:x:0:0:root:/root:/bin/bash
+OBSERVED: the container can still read its own /etc/passwd. SELinux
+container_t does not apply the AppArmor profile's path-based deny rule.
+
+shell executed
+OBSERVED: /bin/sh still executes. Default container_t policy does not
+block binaries inside the image; no custom SELinux exec policy was added.
+
+RESULT: all SELinux and container-hardening checks passed.

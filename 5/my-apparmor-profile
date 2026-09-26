@@ -1,0 +1,47 @@
+#include <tunables/global>
+
+# Loaded with: apparmor_parser -r /etc/apparmor.d/my-apparmor-profile
+# Docker attaches it with: --security-opt apparmor=my-apparmor-profile
+profile my-apparmor-profile flags=(attach_disconnected,mediate_deleted) {
+  #include <abstractions/base>
+
+  # Python from the official image, plus the application code.
+  /usr/local/bin/python* ix,
+  /usr/local/lib/** mr,
+  /app/** rwk,
+
+  # Shared libraries needed by the interpreter.
+  /lib/** mr,
+  /lib64/** mr,
+  /usr/lib/** mr,
+
+  # Sensitive host files are unreadable from inside the container.
+  deny /etc/passwd rwkl,
+  deny /etc/shadow rwkl,
+  deny /etc/group rwkl,
+  deny /etc/gshadow rwkl,
+  deny /etc/sudoers rwkl,
+  deny /etc/sudoers.d/** rwkl,
+  deny /etc/ssh/** rwkl,
+  deny /etc/ssl/private/** rwkl,
+  deny /etc/** w,
+
+  # Do not let the container change state under /var.
+  deny /var/** rwkl,
+
+  # Only the interpreter may be executed; shells and utilities are blocked.
+  deny /bin/** rmx,
+  deny /sbin/** rmx,
+  deny /usr/bin/** rmx,
+  deny /usr/sbin/** rmx,
+
+  # Networking needed by Flask.
+  network inet stream,
+  network inet6 stream,
+
+  capability net_bind_service,
+  deny capability sys_admin,
+  deny capability sys_ptrace,
+  deny capability sys_module,
+  deny capability sys_rawio,
+}

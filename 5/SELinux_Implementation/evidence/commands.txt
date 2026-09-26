@@ -1,0 +1,58 @@
+# Commands and checks performed on the Fedora host (2026-10-20)
+
+Top-level checks:
+
+```bash
+getenforce
+sestatus
+grep -E '^SELINUX=' /etc/selinux/config
+docker info --format '{{json .SecurityOptions}}'
+
+cd 5
+./SELinux_Implementation/selinux_setup.sh
+./SELinux_Implementation/selinux_test.sh
+```
+
+The setup script executed these Docker checks:
+
+```bash
+docker run --rm flask-apparmor sh -c \
+  'cat /proc/self/attr/current | tr -d "\000"; echo'
+docker create --security-opt label=type:container_t \
+  --security-opt label=level:s0:c100,c200 flask-apparmor true
+docker inspect "$CID" --format \
+  'SecurityOpt={{json .HostConfig.SecurityOpt}} ProcessLabel={{.ProcessLabel}} MountLabel={{.MountLabel}}'
+```
+
+The test script executed these checks:
+
+```bash
+docker run --rm -v "$TEST_DIR:/data:ro" flask-apparmor cat /data/data.txt
+docker run --rm -v "$TEST_DIR:/data:ro,z" flask-apparmor cat /data/data.txt
+docker run --rm flask-apparmor python -c \
+  'import os; open("/tmp/probe", "w").close(); os.chown("/tmp/probe", 1000, 1000)'
+docker run --rm --cap-drop=ALL flask-apparmor python -c \
+  'import os; open("/tmp/probe", "w").close(); os.chown("/tmp/probe", 1000, 1000)'
+docker run --rm --security-opt no-new-privileges flask-apparmor \
+  grep NoNewPrivs /proc/self/status
+docker run -d --name "$APP_NAME" \
+  --security-opt label=type:container_t \
+  --security-opt label=level:s0:c100,c200 \
+  --security-opt no-new-privileges \
+  --cap-drop=ALL --read-only --tmpfs /tmp \
+  -p 127.0.0.1:15005:5000 flask-apparmor
+docker inspect "$APP_NAME" --format \
+  'SecurityOpt={{json .HostConfig.SecurityOpt}} ReadonlyRootfs={{.HostConfig.ReadonlyRootfs}} CapDrop={{json .HostConfig.CapDrop}} ProcessLabel={{.ProcessLabel}} MountLabel={{.MountLabel}}'
+docker exec "$APP_NAME" sh -c \
+  'cat /proc/self/attr/current | tr -d "\000"; echo'
+docker exec "$APP_NAME" grep -E 'CapEff|NoNewPrivs' /proc/self/status
+curl -fsS http://127.0.0.1:15005/
+docker exec "$APP_NAME" python -c \
+  'import os; open("/tmp/probe", "w").close(); os.chown("/tmp/probe", 1000, 1000)'
+docker exec "$APP_NAME" sh -c 'echo probe >/etc/probe'
+docker exec "$APP_NAME" sh -c 'head -1 /etc/passwd'
+docker exec "$APP_NAME" /bin/sh -c 'echo shell executed'
+```
+
+`$TEST_DIR` was a `mktemp` directory under `$HOME`, and `$APP_NAME` was a
+test-only container name. Both were removed by the script's exit trap.
