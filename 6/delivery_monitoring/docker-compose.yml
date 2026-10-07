@@ -1,0 +1,47 @@
+services:
+  delivery-metrics:
+    build: .
+    image: delivery-metrics:latest
+    container_name: delivery-metrics
+    environment:
+      SIMULATE_ALERT: "${SIMULATE_ALERT:-0}"
+    ports:
+      - "8000:8000"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/metrics')"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  prometheus:
+    build:
+      context: .
+      dockerfile: Dockerfile.prometheus
+    image: delivery-prometheus:latest
+    container_name: prometheus
+    ports:
+      - "9090:9090"
+    depends_on:
+      - delivery-metrics
+    volumes:
+      - prometheus-data:/prometheus
+
+  grafana:
+    build:
+      context: .
+      dockerfile: Dockerfile.grafana
+    image: delivery-grafana:latest
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: "${GRAFANA_ADMIN_PASSWORD:-admin}"
+    depends_on:
+      - prometheus
+    volumes:
+      - grafana-data:/var/lib/grafana
+
+volumes:
+  prometheus-data:
+  grafana-data:

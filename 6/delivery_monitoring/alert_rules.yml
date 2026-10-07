@@ -1,0 +1,29 @@
+groups:
+  - name: delivery_alerts
+    rules:
+      - alert: HighPendingDeliveries
+        expr: pending_deliveries > 10
+        for: 15s
+        labels:
+          severity: warning
+        annotations:
+          summary: "High pending deliveries"
+          description: "Pending deliveries are above 10 for the last 15 seconds."
+
+      - alert: HighAverageDeliveryTime
+        expr: rate(average_delivery_time_sum[1m]) / rate(average_delivery_time_count[1m]) > 30
+        for: 15s
+        labels:
+          severity: critical
+        annotations:
+          summary: "High average delivery time"
+          description: "Average delivery time is above 30 seconds for the last 15 seconds."
+
+      - alert: DeliveryServiceDown
+        expr: up{job="delivery_service"} == 0
+        for: 15s
+        labels:
+          severity: critical
+        annotations:
+          summary: "Delivery metrics service is down"
+          description: "Prometheus has failed to scrape the delivery metrics service for 15 seconds."

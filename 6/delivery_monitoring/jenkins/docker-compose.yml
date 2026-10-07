@@ -1,0 +1,22 @@
+services:
+  jenkins:
+    build: .
+    container_name: jenkins-lab6
+    ports:
+      - "8080:8080"
+      - "50000:50000"
+    environment:
+      DOCKER_HOST: unix:///var/run/docker.sock
+    volumes:
+      - jenkins_home:/var/jenkins_home
+      - /var/run/docker.sock:/var/run/docker.sock
+    # On SELinux hosts (for example Fedora) the container needs this to use
+    # the mounted Docker socket. It has no effect when SELinux is disabled.
+    security_opt:
+      - label=disable
+    # Must match the GID of the host's docker group.
+    group_add:
+      - "${DOCKER_GID:-999}"
+
+volumes:
+  jenkins_home:

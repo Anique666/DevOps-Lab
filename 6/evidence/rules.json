@@ -1,0 +1,90 @@
+{
+  "status": "success",
+  "data": {
+    "groups": [
+      {
+        "name": "delivery_alerts",
+        "file": "/etc/prometheus/alert_rules.yml",
+        "rules": [
+          {
+            "state": "pending",
+            "name": "HighPendingDeliveries",
+            "query": "pending_deliveries > 10",
+            "duration": 15,
+            "keepFiringFor": 0,
+            "labels": {
+              "severity": "warning"
+            },
+            "annotations": {
+              "description": "Pending deliveries are above 10 for the last 15 seconds.",
+              "summary": "High pending deliveries"
+            },
+            "alerts": [
+              {
+                "labels": {
+                  "alertname": "HighPendingDeliveries",
+                  "instance": "delivery-metrics:8000",
+                  "job": "delivery_service",
+                  "severity": "warning"
+                },
+                "annotations": {
+                  "description": "Pending deliveries are above 10 for the last 15 seconds.",
+                  "summary": "High pending deliveries"
+                },
+                "state": "pending",
+                "activeAt": "2026-10-19T18:10:48.919052257Z",
+                "value": "1.8e+01"
+              }
+            ],
+            "health": "ok",
+            "evaluationTime": 0.000377018,
+            "lastEvaluation": "2026-10-19T18:10:48.922753737Z",
+            "type": "alerting"
+          },
+          {
+            "state": "inactive",
+            "name": "HighAverageDeliveryTime",
+            "query": "rate(average_delivery_time_sum[1m]) / rate(average_delivery_time_count[1m]) > 30",
+            "duration": 15,
+            "keepFiringFor": 0,
+            "labels": {
+              "severity": "critical"
+            },
+            "annotations": {
+              "description": "Average delivery time is above 30 seconds for the last 15 seconds.",
+              "summary": "High average delivery time"
+            },
+            "alerts": [],
+            "health": "ok",
+            "evaluationTime": 0.000125486,
+            "lastEvaluation": "2026-10-19T18:10:48.923134913Z",
+            "type": "alerting"
+          },
+          {
+            "state": "inactive",
+            "name": "DeliveryServiceDown",
+            "query": "up{job=\"delivery_service\"} == 0",
+            "duration": 15,
+            "keepFiringFor": 0,
+            "labels": {
+              "severity": "critical"
+            },
+            "annotations": {
+              "description": "Prometheus has failed to scrape the delivery metrics service for 15 seconds.",
+              "summary": "Delivery metrics service is down"
+            },
+            "alerts": [],
+            "health": "ok",
+            "evaluationTime": 0.000034916,
+            "lastEvaluation": "2026-10-19T18:10:48.92326138Z",
+            "type": "alerting"
+          }
+        ],
+        "interval": 5,
+        "limit": 0,
+        "evaluationTime": 0.000561384,
+        "lastEvaluation": "2026-10-19T18:10:48.922736525Z"
+      }
+    ]
+  }
+}

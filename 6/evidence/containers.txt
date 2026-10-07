@@ -1,0 +1,4 @@
+NAME               IMAGE                        COMMAND                  SERVICE            CREATED          STATUS                             PORTS
+delivery-metrics   delivery-metrics:latest      "python delivery_met…"   delivery-metrics   11 seconds ago   Up 10 seconds (health: starting)   0.0.0.0:8000->8000/tcp, [::]:8000->8000/tcp
+grafana            delivery-grafana:latest      "/run.sh"                grafana            10 seconds ago   Up 9 seconds                       0.0.0.0:3000->3000/tcp, [::]:3000->3000/tcp
+prometheus         delivery-prometheus:latest   "/bin/prometheus --c…"   prometheus         11 seconds ago   Up 9 seconds                       0.0.0.0:9090->9090/tcp, [::]:9090->9090/tcp

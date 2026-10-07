@@ -1,0 +1,58 @@
+{
+  "status": "success",
+  "data": {
+    "activeTargets": [
+      {
+        "discoveredLabels": {
+          "__address__": "delivery-metrics:8000",
+          "__metrics_path__": "/metrics",
+          "__scheme__": "http",
+          "__scrape_interval__": "5s",
+          "__scrape_timeout__": "5s",
+          "job": "delivery_service"
+        },
+        "labels": {
+          "instance": "delivery-metrics:8000",
+          "job": "delivery_service"
+        },
+        "scrapePool": "delivery_service",
+        "scrapeUrl": "http://delivery-metrics:8000/metrics",
+        "globalUrl": "http://delivery-metrics:8000/metrics",
+        "lastError": "",
+        "lastScrape": "2026-10-19T18:10:45.502860549Z",
+        "lastScrapeDuration": 0.002901146,
+        "health": "up",
+        "scrapeInterval": "5s",
+        "scrapeTimeout": "5s"
+      },
+      {
+        "discoveredLabels": {
+          "__address__": "localhost:9090",
+          "__metrics_path__": "/metrics",
+          "__scheme__": "http",
+          "__scrape_interval__": "5s",
+          "__scrape_timeout__": "5s",
+          "job": "prometheus"
+        },
+        "labels": {
+          "instance": "localhost:9090",
+          "job": "prometheus"
+        },
+        "scrapePool": "prometheus",
+        "scrapeUrl": "http://localhost:9090/metrics",
+        "globalUrl": "http://fdb5ddbb1b7c:9090/metrics",
+        "lastError": "",
+        "lastScrape": "2026-10-19T18:10:47.348948481Z",
+        "lastScrapeDuration": 0.006609768,
+        "health": "up",
+        "scrapeInterval": "5s",
+        "scrapeTimeout": "5s"
+      }
+    ],
+    "droppedTargets": [],
+    "droppedTargetCounts": {
+      "delivery_service": 0,
+      "prometheus": 0
+    }
+  }
+}

@@ -1,0 +1,128 @@
+pipeline {
+    agent any
+
+    options {
+        timestamps()
+        disableConcurrentBuilds()
+    }
+
+    environment {
+        APP_DIR = '.'
+        NETWORK = 'delivery-ci-net'
+        METRICS = 'delivery-metrics-ci'
+        PROMETHEUS = 'prometheus-ci'
+        GRAFANA = 'grafana-ci'
+    }
+
+    stages {
+        stage('Locate project') {
+            steps {
+                script {
+                    // Works when the job checks out the whole DevOps repo and
+                    // when delivery_monitoring is the repository root.
+                    if (fileExists('6/delivery_monitoring/Dockerfile')) {
+                        env.APP_DIR = '6/delivery_monitoring'
+                    }
+                    echo "Project directory: ${env.APP_DIR}"
+                }
+            }
+        }
+
+        stage('Validate Prometheus config') {
+            steps {
+                dir(env.APP_DIR) {
+                    sh '''
+                        docker build -t delivery-prometheus:ci -f Dockerfile.prometheus .
+                        docker run --rm --entrypoint promtool delivery-prometheus:ci \
+                            check config /etc/prometheus/prometheus.yml
+                    '''
+                }
+            }
+        }
+
+        stage('Build images') {
+            steps {
+                dir(env.APP_DIR) {
+                    sh '''
+                        docker build -t delivery-metrics:ci .
+                        docker build -t delivery-grafana:ci -f Dockerfile.grafana .
+                    '''
+                }
+            }
+        }
+
+        stage('Start monitoring stack') {
+            steps {
+                sh '''
+                    docker rm -f "$METRICS" "$PROMETHEUS" "$GRAFANA" 2>/dev/null || true
+                    docker network inspect "$NETWORK" >/dev/null 2>&1 || docker network create "$NETWORK"
+
+                    # The aliases keep the Prometheus target and Grafana data
+                    # source names identical to the compose setup.
+                    docker run -d --name "$METRICS" --network "$NETWORK" \
+                        --network-alias delivery-metrics \
+                        -p 8000:8000 delivery-metrics:ci
+                    docker run -d --name "$PROMETHEUS" --network "$NETWORK" \
+                        --network-alias prometheus \
+                        -p 9090:9090 delivery-prometheus:ci
+                    docker run -d --name "$GRAFANA" --network "$NETWORK" \
+                        --network-alias grafana \
+                        -p 3000:3000 -e GF_SECURITY_ADMIN_PASSWORD=admin delivery-grafana:ci
+                '''
+            }
+        }
+
+        stage('Verify metrics and target') {
+            steps {
+                sh '''
+                    for i in $(seq 1 20); do
+                        if docker exec "$METRICS" python -c \
+                            "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/metrics')" 2>/dev/null; then
+                            break
+                        fi
+                        sleep 1
+                    done
+
+                    docker exec "$METRICS" python -c \
+                        "import urllib.request; print(urllib.request.urlopen('http://127.0.0.1:8000/metrics').read().decode())" \
+                        | grep -q '^total_deliveries'
+
+                    docker exec "$METRICS" python -c \
+                        "import urllib.request; print(urllib.request.urlopen('http://prometheus:9090/-/ready').read().decode())" \
+                        | grep -q 'Ready'
+
+                    # Wait until Prometheus has actually scraped the app.
+                    for i in $(seq 1 30); do
+                        if docker exec "$METRICS" python -c "import json,urllib.request; d=json.load(urllib.request.urlopen('http://prometheus:9090/api/v1/targets')); raise SystemExit(0 if any(t['labels']['job']=='delivery_service' and t['health']=='up' for t in d['data']['activeTargets']) else 1)" 2>/dev/null; then
+                            break
+                        fi
+                        sleep 1
+                    done
+
+                    docker exec "$METRICS" python -c \
+                        "import urllib.request; print(urllib.request.urlopen('http://prometheus:9090/api/v1/targets').read().decode())" \
+                        | grep -q '"job":"delivery_service"'
+                '''
+            }
+        }
+
+        stage('Verify alert rules') {
+            steps {
+                sh '''
+                    docker exec "$METRICS" python -c \
+                        "import urllib.request; print(urllib.request.urlopen('http://prometheus:9090/api/v1/rules').read().decode())" \
+                        | grep -q 'HighPendingDeliveries'
+                '''
+            }
+        }
+    }
+
+    post {
+        always {
+            sh '''
+                docker rm -f "$METRICS" "$PROMETHEUS" "$GRAFANA" 2>/dev/null || true
+                docker network rm "$NETWORK" 2>/dev/null || true
+            '''
+        }
+    }
+}
