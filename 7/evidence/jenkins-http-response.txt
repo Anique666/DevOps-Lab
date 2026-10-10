@@ -1,0 +1,21 @@
+HTTP/1.1 200 OK
+Server: Jetty(12.1.5)
+Date: Mon, 19 Oct 2026 18:11:40 GMT
+Vary: Accept-Encoding
+X-Content-Type-Options: nosniff
+Content-Security-Policy-Report-Only: base-uri 'none'; default-src 'self'; form-action 'self'; frame-ancestors 'self'; img-src 'self' data:; script-src 'report-sample' 'self' usage.jenkins.io; style-src 'report-sample' 'self' 'unsafe-inline'; report-to content-security-policy; report-uri http://localhost:8080/content-security-policy-reporting-endpoint/XEfRqxikNlgZW_RM2FC4RqcrCGlW_Nun_FK1prLzGRg=:YW5vbnltb3Vz:aHVkc29uLm1vZGVsLkh1ZHNvbg==:bG9naW4=
+Content-Type: text/html;charset=utf-8
+Expires: 0
+Cache-Control: no-cache,no-store,must-revalidate
+X-Hudson: 1.395
+X-Jenkins: 2.541.3
+X-Jenkins-Session: f8cb1d9d
+X-Frame-Options: sameorigin
+Reporting-Endpoints: content-security-policy: http://localhost:8080/content-security-policy-reporting-endpoint/XEfRqxikNlgZW_RM2FC4RqcrCGlW_Nun_FK1prLzGRg=:YW5vbnltb3Vz:aHVkc29uLm1vZGVsLkh1ZHNvbg==:bG9naW4=
+Set-Cookie: JSESSIONID.a5a289e6=node013pntqlbuo8v51rnnwkaab9qqb1.node0; Path=/; HttpOnly; SameSite=Lax
+X-Hudson-Theme: default
+Referrer-Policy: same-origin
+Cross-Origin-Opener-Policy: same-origin
+X-Frame-Options: sameorigin
+Transfer-Encoding: chunked
+

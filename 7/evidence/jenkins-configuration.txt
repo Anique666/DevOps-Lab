@@ -1,0 +1,1 @@
+Image: jenkins/jenkins:lts-jdk17 | Status: running | Ports: {"50000/tcp":[{"HostIp":"","HostPort":"50000"}],"8080/tcp":[{"HostIp":"","HostPort":"8080"}]} | Mounts: [{"Type":"volume","Name":"7_jenkins_home","Source":"/var/lib/docker/volumes/7_jenkins_home/_data","Destination":"/var/jenkins_home","Driver":"local","Mode":"rw","RW":true,"Propagation":""}]
