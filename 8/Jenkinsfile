@@ -1,0 +1,21 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Hello World') {
+            steps {
+                script {
+                    // Works from the repo root and when this folder is the
+                    // repository root.
+                    def appDir = fileExists('8/hello-world.sh') ? '8' : '.'
+                    dir(appDir) {
+                        sh '''
+                            chmod +x hello-world.sh
+                            ./hello-world.sh
+                        '''
+                    }
+                }
+            }
+        }
+    }
+}
