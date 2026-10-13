@@ -1,0 +1,8 @@
+HTTP/1.1 200 OK
+Server: Werkzeug/3.1.9 Python/3.12.15
+Date: Mon, 19 Oct 2026 18:12:19 GMT
+Content-Type: text/html; charset=utf-8
+Content-Length: 36
+Connection: close
+
+Hello, Jenkins Multi-Stage Pipeline!

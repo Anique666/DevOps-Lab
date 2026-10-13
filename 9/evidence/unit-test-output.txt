@@ -1,0 +1,7 @@
+test_home (test_app.TestApp.test_home) ... ok
+
+----------------------------------------------------------------------
+Ran 1 test in 0.008s
+
+OK
+Hello, Jenkins Multi-Stage Pipeline!

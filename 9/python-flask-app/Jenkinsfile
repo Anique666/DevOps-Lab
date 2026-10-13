@@ -1,0 +1,108 @@
+pipeline {
+    agent any
+
+    environment {
+        APP_DIR = '.'
+        APP_PORT = '5001'
+    }
+
+    stages {
+        stage('Locate project') {
+            steps {
+                script {
+                    // Works when the job checks out the whole DevOps repo and
+                    // when python-flask-app is the repository root.
+                    if (fileExists('9/python-flask-app/app.py')) {
+                        env.APP_DIR = '9/python-flask-app'
+                    }
+                    echo "Project directory: ${env.APP_DIR}"
+                }
+            }
+        }
+
+        stage('Build') {
+            steps {
+                echo 'Creating virtual environment and installing dependencies...'
+                dir(env.APP_DIR) {
+                    sh '''
+                        python3 -m venv .venv
+                        .venv/bin/pip install --upgrade pip
+                        .venv/bin/pip install -r requirements.txt
+                    '''
+                }
+            }
+        }
+
+        stage('Test') {
+            steps {
+                echo 'Running unit tests...'
+                dir(env.APP_DIR) {
+                    sh '.venv/bin/python -m unittest discover -s . -v'
+                }
+            }
+        }
+
+        stage('Deploy') {
+            steps {
+                echo 'Deploying application...'
+                dir(env.APP_DIR) {
+                    sh '''
+                        rm -rf python-app-deploy
+                        mkdir -p python-app-deploy
+                        cp app.py requirements.txt python-app-deploy/
+                    '''
+                }
+            }
+        }
+
+        stage('Run Application') {
+            steps {
+                echo 'Starting application...'
+                dir(env.APP_DIR) {
+                    sh '''
+                        cd python-app-deploy
+                        PORT="$APP_PORT" nohup ../.venv/bin/python app.py > app.log 2>&1 &
+                        echo $! > app.pid
+
+                        for i in $(seq 1 20); do
+                            if ../.venv/bin/python -c "import urllib.request; urllib.request.urlopen('http://127.0.0.1:$APP_PORT/')" 2>/dev/null; then
+                                exit 0
+                            fi
+                            sleep 1
+                        done
+                        echo "Application did not start"; cat app.log; exit 1
+                    '''
+                }
+            }
+        }
+
+        stage('Test Application') {
+            steps {
+                echo 'Testing the running application...'
+                dir(env.APP_DIR) {
+                    sh '''
+                        .venv/bin/python -c "import urllib.request; body = urllib.request.urlopen('http://127.0.0.1:$APP_PORT/').read().decode(); assert body == 'Hello, Jenkins Multi-Stage Pipeline!', body; print(body)"
+                    '''
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            dir(env.APP_DIR) {
+                sh '''
+                    if [ -f python-app-deploy/app.pid ]; then
+                        kill "$(cat python-app-deploy/app.pid)" 2>/dev/null || true
+                    fi
+                '''
+            }
+        }
+        success {
+            echo 'Pipeline completed successfully!'
+        }
+        failure {
+            echo 'Pipeline failed. Check the logs for more details.'
+        }
+    }
+}
