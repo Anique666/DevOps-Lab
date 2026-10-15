@@ -1,0 +1,2 @@
+NAME                    ENDPOINTS                                   AGE
+shopping-cart-service   10.244.0.3:80,10.244.1.3:80,10.244.3.3:80   7s

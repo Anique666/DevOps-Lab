@@ -1,0 +1,3 @@
+NAME                         DESIRED   CURRENT   READY   AGE   CONTAINERS                  IMAGES                   SELECTOR
+product-catalog-6969c895db   2         2         2       7s    product-catalog-container   product-catalog:latest   app=product-catalog,pod-template-hash=6969c895db
+shopping-cart-7c45856bd6     3         3         3       7s    shopping-cart-container     shopping-cart:latest     app=shopping-cart,pod-template-hash=7c45856bd6
